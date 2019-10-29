@@ -1,0 +1,6 @@
+git config --global user.email 'a@a.com'
+git config --global user.name 'bbb'
+git status
+git add .
+git commit -m 'update'
+git push origin
