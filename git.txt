@@ -2,5 +2,9 @@ git config --global user.email 'a@a.com'
 git config --global user.name 'bbb'
 git status
 git add .
-git commit -m 'update'
+git commit -m 'explanation'
 git push origin
+
+git fetch origin master//取回origin主机的master分支
+git log -p fetch_head //指的是某个branch在服务器上的最新状态
+git merge fetch_head//将拉取下来的最新内容合并到当前所在的分支中
