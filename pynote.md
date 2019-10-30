@@ -1,6 +1,8 @@
+# week1
+
 ## requests入门
 
-#### 0 Requests下载
+### 0 Requests下载
 
 pip install requests
 
@@ -12,7 +14,7 @@ r.encoding = 'utf-8'
 r.text
 ```
 
-#### 1 Requests库的get方法
+### 1 Requests库的get方法
 
 requests.get(url,params=NONE,**kwargs)
 
@@ -31,7 +33,7 @@ import requests
 r = requests.
 ```
 
-#### 2 request异常（基本框架）
+### 2 request异常（基本框架）
 
 requests.Connection	网络连接错误异常
 
@@ -62,7 +64,7 @@ if __name__=="__main__":
 	print(getHTMLText(url))
 ```
 
-#### 3 http协议及Requests库方法
+### 3 http协议及Requests库方法
 
 URL格式	http://host[:port][path]
 
@@ -98,7 +100,7 @@ r = requests.post('http://httpbin.org/post', data = 'ABC') # ABC在data段
 print(r.text)
 ```
 
-#### 4 Requests库主要方法解析
+### 4 Requests库主要方法解析
 
 requests.request(method,url,**kwargs)
 
@@ -133,7 +135,7 @@ requests.request('POST','http://python123.io/ws',files=fs)
 
 ## robots协议
 
-#### 0 网络爬虫引发的问题
+### 0 网络爬虫引发的问题
 
 ​	小规模：Requests库	>90%
 
@@ -145,7 +147,7 @@ requests.request('POST','http://python123.io/ws',files=fs)
 
 ​			Robots协议
 
-#### 1 Robots协议
+### 1 Robots协议
 
 网络爬虫排除标准：哪些页面可以抓取，哪些不行
 
@@ -153,13 +155,13 @@ robots.txt
 
  https://www.jd.com/robots.txt 
 
-#### 2 Robots协议的使用
+### 2 Robots协议的使用
 
 自动/人工识别robots.txt
 
 ## 5个实例
 
-#### 1 京东商品链接
+### 0京东商品链接
 
  https://item.jd.com/100004404944.html 
 
@@ -184,9 +186,9 @@ except:
 	print("产生异常")
 ```
 
-#### 2 亚马逊商品信息
+1 亚马逊商品信息（修改头部）
 
- https://www.amazon.cn/dp/B07TYR42LV?ref_=Oct_RecCard_dsk_asin1&pf_rd_r=WRXG4CC7TEJEN9VX19DQ&pf_rd_p=d7526bc5-3640-48d5-8d6b-448fefacc51e&pf_rd_m=A1AJ19PSB66TGU&pf_rd_s=desktop-4 
+ https://www.amazon.cn/dp/B07TYR42LV
 
 ```python
 import requests
@@ -204,4 +206,79 @@ page = r.text
 print(page)
 ```
 
-#### 3 b
+### 2 baidu 360 搜索关键词提交
+
+http://www.baidu.com/s?wd=<font color=blue>keyword</font>
+
+http://www.so.com/s?q=<font color=blue>keyword</font>
+
+```python
+import requests
+arg='wd'
+keyword='Python'
+try:
+    kv={arg:keyword}
+    r = requests.get('http://www.baidu.com/s',params = kv)
+    r.raise_for_status()
+    print(r.status_code)
+    print(r.request.url)
+    print(len(r.text))
+except:
+    print("spider failed")
+```
+
+### 3 网络图片的爬取（下载图片）
+
+格式：http://www.exp.com/pic.jpg
+
+国家地理：<http://www.ngchina.com.cn/>
+
+http://image.ngchina.com.cn/2019/1026/20191026093445665.jpg
+
+```python
+import requests
+import os
+url = "http://image.ngchina.com.cn/2019/1026/20191026093445665.jpg"
+root = "E://kaifa//pics//"
+path = root + url.split('/')[-1]
+try:
+    # 当前根目录是否存在
+    if not os.path.exists(root):
+        os.mkdir(root)
+    print(path)
+    # 当前文件是否存在
+    if not os.path.exists(path):
+        r = requests.get(url)
+        r.raise_for_status()
+        print(r.status_code)
+        with open(path,'wb') as f:
+            f.write(r.content)
+            f.close()
+    else:
+        print("file exists!")
+except:
+    print("spider failed")
+    
+```
+
+### 4 IP地址归属地自动查询
+
+```python
+import requests
+url = "http://m.ip138.com/ip.asp?ip="
+try:
+    r = requests.get(url + '202.204.80.112')
+    r.raise_for_status()
+    print(r.status_code)
+    r.encoding = r.apparent_encoding
+    print(r.text[-500:])
+except:
+    print("spider failed")
+```
+
+# week2
+
+## ok
+
+
+
