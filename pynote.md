@@ -278,7 +278,23 @@ except:
 
 # week2
 
-## ok
+## 1 beautifulsoup安装
 
+pip install beautifulsoup4
 
+python123.io/ws/demo.html
+
+```python
+from bs4 import BeautifulSoup
+soup = Beautifu[lSoup(demo,'html.parser')
+print(soup.prettify())
+```
+
+字符串标签树->beautifulsoup类
+
+- tag标签 <></>
+- name 标签名
+- attributes 标签属性
+- navigableString标签内非属性字符串
+- Comment 标签内字符串注释
 
