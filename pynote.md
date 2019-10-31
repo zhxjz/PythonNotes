@@ -286,15 +286,40 @@ python123.io/ws/demo.html
 
 ```python
 from bs4 import BeautifulSoup
-soup = Beautifu[lSoup(demo,'html.parser')
+soup = BeautifulSoup(demo,'html.parser')
 print(soup.prettify())
 ```
 
-字符串标签树->beautifulsoup类
+字符串标签树 ——> beautifulsoup类
 
 - tag标签 <></>
 - name 标签名
 - attributes 标签属性
 - navigableString标签内非属性字符串
 - Comment 标签内字符串注释
+
+标签书的下行遍历
+
+- .contents 子节点列表 < tag >所有儿子节点存入列表
+- .children 子节点迭代类型
+- .descendants 子孙节点迭代类型
+
+```python
+# 遍历儿子节点
+for child in soup.body.children:
+    print(child)
+    
+# 遍历子孙节点
+for child in soup.body.descendants:
+    print(child)
+```
+
+标签树的上行遍历
+
+```python
+soup = BeautifulSoup(demo, 'html.parser')
+for parent in soup.a.
+```
+
+
 
