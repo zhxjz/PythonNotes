@@ -566,3 +566,157 @@ def main():
 main()
 ```
 
+# week3
+
+## 正则表达式
+
+### 0 正则表达式概念
+
+regular expression regex RE 一行胜千言。
+
+py开头，后续存在不多于10个字符，不能是p或者y
+
+py[ ^py ]{0,10}
+
+作用：查找替换，匹配字符串
+
+编译：字符串——>正则表达式
+
+### 1 正则表达式语法
+
+. 任何单个字符
+
+[] 字符集，对单个字符表示取值范围
+
+[^] 非字符集
+
+*前一个字符>=0次	abc *:ab,abc,abccc
+
++前一个字符>=1
+
+？前一个字符0/1次扩展
+
+|左或右
+
+{m}前一个字符扩展m次
+
+{m,n}扩展前一个字符[m,n]次
+
+^匹配字符串开头
+
+$匹配字符串结尾
+
+()分组标记(abc|def)
+
+\d [0-9]
+
+\w [A-Za-z0-9]
+
+例子：
+
+p(y|yt|yth|ytho)?n: pn pyn pytn pythn python
+
+python+: python pythonn pythonnn...
+
+py[th]on: pyton pyhon
+
+py[ ^th]?on: pyon pyaon pybon ...
+
+^[A-Za-z]+$ 26个字母组成的字符串
+
+^[A-Za-z0-9]+$
+
+^-?\d+$整数
+
+[\u4e00-\u9fa5]中文字符
+
+\d(3)-\d(8)|\d(4)-\d(7)国内电话号码
+
+**匹配IP地址的正则表达式**
+
+\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3} 
+
+​		300.300.300显然X
+
+0-99: [1-9]?\d
+
+100-199:1\d{2}
+
+200-249:2[0-4]\d
+
+250-255:25[0-5]
+
+### 2 re库
+
+ raw string类型（不包括\） r'[1-9]\d{5}'
+
+字符串前加个r
+
+string类型 要用转义符\ '[1-9]\ \d{5}'
+
+- .search() 搜索第一个位置返回
+
+  pattern,string,flags=0
+
+  string:待匹配
+
+  flags: 控制标记
+
+  ​		re.I 忽略大小写
+
+  ​		re.M字符串每行当作匹配开始
+
+  ​		re.S .操作符匹配所有字符（除\n以外）
+
+  ```python
+  import re
+  match = re.search(r'[1-9]\d{5}','BIT 100081')
+  if match:
+      print(match.group(0))
+  ```
+
+- .match() 在开始位置起
+
+- .findall() 搜索字符串返回全部
+
+- .split() 将一个字符串按照正则表达式匹配结果分割，列表
+
+  pattern,string,maxsplit=0,flags=0
+
+  maxsplit:最大分割数，剩余部分作为最后一个元素输出
+
+  ```python
+  import re
+  re.split(r'[1-9]\d{5}','BIT100081 TSU100084')
+  re.split(r'[1-9]\d{5}','BIT100081 TSU100084',maxsplit=1)
+  ```
+
+- .finditer() 搜索字符串返回匹配结果迭代类型，match对象
+
+  ```python
+  import re
+  for m in re.finditer(r'[1-9]\d{5}','BIT100081 TSU100084'):
+      if m:
+          print(m.group(0))
+  ```
+
+- .sub() 替换所有匹配子串
+
+  pattern,repl, string, count=0, flags=0
+
+  repl：替换字符串
+
+  count:最大替换次数
+
+  ```python
+  import re
+  re.sub(r'[1-9]\d{5}',':zipcode','BIT100081 TSU100084')
+  ```
+
+  
+
+**面向对象方式：编译后多次操作**
+
+pat =  re.compile(r'')
+
+rst = pat.search(目标串)
