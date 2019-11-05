@@ -720,3 +720,280 @@ string类型 要用转义符\ '[1-9]\ \d{5}'
 pat =  re.compile(r'')
 
 rst = pat.search(目标串)
+
+### 3 match对象的属性和方法
+
+属性：
+
+.string: 待匹配文本
+
+.re: pattern对象 正则表达式
+
+.pos: 搜索文本的开始位置
+
+.endpos: 搜索文本的结束位置
+
+方法：
+
+.group(0): 获得匹配后的字符串
+
+.start(): 匹配字符串在原始字符串的开始位置
+
+.end(): 匹配字符串在原始字符串的结束位置
+
+.span(): 返回( .start(), .end() )
+
+### 4 贪婪匹配/最小匹配
+
+**Re库默认采用贪婪匹配，输出最长字符串**
+
+最小匹配方法：
+
+*？
+
++？
+
+？？
+
+｛m,n｝？
+
+```python
+import re
+match = re.search(r'PY.*?N','PYANBNCNDN')
+# PYAN
+```
+
+
+
+## 淘宝商品定向爬虫实例
+
+淘宝搜索接口
+
+翻页处理
+
+技术路线：requests-bs4
+
+```
+# 起始页
+https://s.taobao.com/search?initiative_id=staobaoz_20191102&q=%E8%A3%99%E5%AD%90%E5%A5%B3%E7%A7%8B%E5%86%AC&suggest=0_1&_input_charset=utf-8&wq=%E8%A3%99&suggest_query=%E8%A3%99&source=suggest
+# 第二页
+https://s.taobao.com/search?initiative_id=staobaoz_20191102&q=%E8%A3%99%E5%AD%90%E5%A5%B3%E7%A7%8B%E5%86%AC&suggest=0_1&_input_charset=utf-8&wq=%E8%A3%99&suggest_query=%E8%A3%99&source=suggest&bcoffset=3&ntoffset=3&p4ppushleft=1%2C48&s=44
+# 第三页
+https://s.taobao.com/search?initiative_id=staobaoz_20191102&q=%E8%A3%99%E5%AD%90%E5%A5%B3%E7%A7%8B%E5%86%AC&suggest=0_1&_input_charset=utf-8&wq=%E8%A3%99&suggest_query=%E8%A3%99&source=suggest&bcoffset=0&ntoffset=6&p4ppushleft=1%2C48&s=88
+```
+
+https://s.taobao.com/search?q=XXX
+
+页码区别s=44/s=88（起始商品编号）
+
+robots协议不太行。 https://s.taobao.com/robots.txt 
+
+```
+User-agent: *
+Disallow: /
+```
+
+
+
+**程序结构设计：**
+
+1、提交搜索请求，循环获取页面
+
+2、对于每个页面提取商品名称和价格信息
+
+3、将信息输出到屏幕上
+
+
+
+**代码：**
+
+```python
+import requests
+import re
+# headers替换：
+# https://curl.trillworks.com/页面右击检查-network-copy-cURL(cmd)
+headers = {
+    'authority': 's.taobao.com',
+    'cache-control': 'max-age=0',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36',
+    'sec-fetch-user': '?1',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-mode': 'navigate',
+    'referer': 'https://s.taobao.com/',
+    'accept-encoding': 'gzip, deflate, br',
+    'accept-language': 'zh-CN,zh;q=0.9',
+    'cookie': 'XXX',
+}
+
+# 输入：获取的URL信息，输出：获取内容
+def getHTMLText(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        # print(r.text)
+        return r.text
+    except:
+        return ""
+
+# 解析页面
+def parsePage(lis, html):
+    try:
+        plt = re.findall(r'"view_price":"[\d.]*"',html)
+        tlt = re.findall(r'"raw_title":".*?"' ,html)
+        # 最小匹配
+        for i in range(len(plt)):
+            price = eval(plt[i].split(':')[1])
+            title = eval(tlt[i].split(':')[1])
+            lis.append([price,title])
+    except:
+        print("")
+
+# 将列表信息打印出来
+def printGoodsList(lis):
+    tplt = "{:4}\t{:8}\t{:16}"
+    print(tplt.format("序号","价格","名称"))
+    count = 0
+    for g in lis:
+        count = count + 1
+        print(tplt.format(count,g[0],g[1]))
+    print("")
+
+def main():
+    # plt = re.findall(r'"view_price":"[\d.]*"', '"view_price":"580.00"')
+    # print(len(plt))
+    goods="书包"
+    depth=2
+    start_url = 'https://s.taobao.com/search?q='+ goods
+    getHTMLText(start_url)
+    infolist = []
+    for i in range(depth):
+        try:
+            url = start_url + '&s='+str(44*i)
+            html = getHTMLText(url)
+            parsePage(infolist, html)
+        except:
+            continue
+    printGoodsList(infolist)
+
+main()
+```
+
+
+
+## 股票数据定向爬虫实例（待完善）
+
+目标：获取上交所和深交所所有股票的名称和交易信息
+
+输出：保存至文件
+
+技术路线：requests-bs4-re
+
+要求：html页面中，非js代码生成，robots
+
+F12
+
+ https://finance.sina.com.cn/stock/ 
+
+百度股票不太行。 https://gupiao.baidu.com/ 
+
+用腾讯？暂时搁浅
+
+东方财富网： http://quote.eastmoney.com/center/gridlist.html#hs_a_board 
+
+**程序结构：**
+
+1、东方财富网获取股票列表
+
+2、根据股票列表逐个到百度股票获取个股信息
+
+3、结果存储至文件
+
+```python
+import requests
+from bs4 import BeautifulSoup
+import traceback
+import re
+
+def getHTMLText(url, code='utf-8'):
+    try:
+        r = requests.get(url, timeout = 30)
+        r.raise_for_status()
+        # r.encoding = r.apparent_encoding
+        r.encoding = code
+        return r.text
+    except:
+        return ""
+
+# 获取股票列表
+def getStockList(lst, stockURL):
+    html = getHTMLText(stockURL, 'GB2312')
+    soup = BeautifulSoup(html, 'html.parser')
+    a = soup.find_all('a')
+    for i in a:
+        try:
+            href = i.attrs['href']
+            lst.append(re.findall(r'[s][hz]\d{6}',href))
+        except:
+            continue
+
+# 获取股票信息
+def getStockInfo(lst, stockURL, fpath):
+    count = 0
+    for stock in lst:
+        url = stockURL + stock + ".html"
+        html = getHTMLText(url)
+        try:
+            if html =="":
+                continue
+            infoDict = {}
+            soup = BeautifulSoup(html, 'html.parser')
+            stockInfo = soup.find('div',attrs={'class':'stock-bets'})
+
+            name = stockInfo.find_all(attrs={'class':'bets-name'})[0]
+            infoDict.update({'股票名称':name.text.split()[0]})
+
+            keyList = stockInfo.find_all('dt')
+            valueList = stockInfo.find_all('dd')
+            for i in range(len(keyList)):
+                key = keyList[i].text
+                val = valueList[i].text
+                infoDict[key] = val
+
+            with open(fpath, 'a', encoding='utf-8') as f:
+                f.write(str(infoDict)+'\n')
+                count = count + 1
+                print('\r当前进度:{:.2f}%'.format(count*100/len(lst),end=''))
+        #         \r 覆盖，使用command命令行
+        except:
+            # traceback.print_exc()
+            print('\r当前进度:{:.2f}%'.format(count * 100 / len(lst), end=''))
+            continue
+
+def main():
+    stock_list_url = 'http://quote.eastmoney.com/center/gridlist.html'
+    stock_info_url = 'https://gupiao.baidu.com/'
+    output_file = 'E://kaifa//py//list.txt'
+    slist = []
+    getStockList(slist, stock_list_url)
+    getStockInfo(slist, stock_info_url, output_file)
+
+main()
+```
+
+# week4
+
+## scrapy库
+
+### 0 安装
+
+anaconda在清华镜像安装
+
+配置环境变量-系统变量-Path : ...Anaconda\install\Scripts
+
+中间HTTPError
+
+开VPN
